@@ -7,3 +7,8 @@ fp-lib-table
 .DS_Store
 _saved*
 _autosave*
+*.gcode
+*.drl
+*.gbr
+*.gbj
+*.flatcam
