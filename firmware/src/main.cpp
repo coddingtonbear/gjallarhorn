@@ -9,7 +9,12 @@
 #define BT_ENABLE_PIN 8
 
 
+#define MAX_ENABLED_MILLIS 5000
+
+
+bool enabled = false;
 bool enabledByButton = false;
+unsigned long enabledAt = 0;
 
 
 void setup() {
@@ -37,6 +42,10 @@ void loop() {
     if(Serial.available()) {
         char data = Serial.read();
 
+        Serial.write(data);
+        Serial.write('\r');
+        Serial.write('\n');
+
         if(data == '1') {
             doEnable = true;
         } else {
@@ -51,11 +60,29 @@ void loop() {
         enabledByButton = false;
     }
 
+    if(
+        enabled &&
+        !enabledByButton &&
+        (millis() - enabledAt > MAX_ENABLED_MILLIS)
+    ) {
+        Serial.write("Timeout");
+        Serial.write('\r');
+        Serial.write('\n');
+
+        doDisable = true;
+    }
+
     if(doEnable) {
+        enabled = true;
+
         digitalWrite(LED_PIN, HIGH);
         digitalWrite(HORN_PIN, HIGH);
+
+        enabledAt = millis();
     } 
     if(doDisable) {
+        enabled = false;
+
         digitalWrite(LED_PIN, LOW);
         digitalWrite(HORN_PIN, LOW);
     }
